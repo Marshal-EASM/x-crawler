@@ -7,6 +7,8 @@ import (
 )
 
 var cliFlags = []cli.Flag{
+	SetUrl(),
+	SetFile(),
 	SetChromePath(),
 	SetCustomHeaders(),
 	SetPostData(),
@@ -33,9 +35,39 @@ var cliFlags = []cli.Flag{
 	SetPushPoolMax(),
 	SetLogLevel(),
 	SetNoHeadless(),
+	SetIgnoreResponseKeywords(),
+}
+
+func SetIgnoreResponseKeywords() *cli.StringSliceFlag {
+	return &cli.StringSliceFlag{
+		Name:    "ignore-response-keywords",
+		Aliases: []string{"irk"},
+		Value:   ignoreResponseKeywords,
+		Usage:   "crawlergo will not add request which has a keyword in response into output result`. e.g.: -irk login",
+	}
+}
+func SetUrl() *cli.PathFlag {
+
+	return &cli.PathFlag{
+		Name:        "url",
+		Aliases:     []string{"u"},
+		Usage:       "url",
+		Destination: &taskConfig.Url,
+	}
+}
+func SetFile() *cli.PathFlag {
+
+	return &cli.PathFlag{
+		Name:        "file",
+		Aliases:     []string{"l"},
+		Usage:       "file `Path` of url list",
+		Destination: &taskConfig.UrlFile,
+		EnvVars:     []string{"UrlFile"},
+	}
 }
 
 func SetChromePath() *cli.PathFlag {
+
 	return &cli.PathFlag{
 		Name:        "chromium-path",
 		Aliases:     []string{"c"},
@@ -49,7 +81,7 @@ func SetCustomHeaders() *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "custom-headers",
 		Usage:       "add additional `Headers` to each request. The input string will be called json.Unmarshal",
-		Value:       fmt.Sprintf(`{"Spider-Name": "crawlergo", "User-Agent": "%s"}`, config.DefaultUA),
+		Value:       fmt.Sprintf(`{"User-Agent": "%s"}`, config.DefaultUA),
 		Destination: &taskConfig.ExtraHeadersString,
 	}
 }
@@ -139,18 +171,18 @@ func SetRobotsPath() *cli.BoolFlag {
 
 func SetRequestProxy() *cli.StringFlag {
 	return &cli.StringFlag{
-		Name:        "request-proxy",
+		Name:        "proxy",
 		Usage:       "all requests connect through defined proxy server.",
 		Destination: &taskConfig.Proxy,
 	}
 }
 
-// return &cli.BoolFlag{
-//	Name:        "bypass",
-//	Value:       false,
-//	Usage:       "whether to encode url with detected charset.",
-//	Destination: &taskConfig.EncodeURLWithCharset,
-//},
+//	return &cli.BoolFlag{
+//		Name:        "bypass",
+//		Value:       false,
+//		Usage:       "whether to encode url with detected charset.",
+//		Destination: &taskConfig.EncodeURLWithCharset,
+//	},
 func SetEncodeURL() *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "encode-url",

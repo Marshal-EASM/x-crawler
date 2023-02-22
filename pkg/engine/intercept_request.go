@@ -20,7 +20,8 @@ import (
 	"github.com/chromedp/cdproto/network"
 )
 
-/**
+/*
+*
 处理每一个HTTP请求
 */
 func (tab *Tab) InterceptRequest(v *fetch.EventRequestPaused) {
@@ -72,14 +73,16 @@ func (tab *Tab) InterceptRequest(v *fetch.EventRequestPaused) {
 	_ = fetch.ContinueRequest(v.RequestID).Do(ctx)
 }
 
-/**
+/*
+*
 判断是否为导航请求
 */
 func (tab *Tab) IsNavigatorRequest(networkID string) bool {
 	return networkID == tab.LoaderID
 }
 
-/**
+/*
+*
 处理 401 407 认证弹窗
 */
 func (tab *Tab) HandleAuthRequired(req *fetch.EventAuthRequired) {
@@ -95,7 +98,8 @@ func (tab *Tab) HandleAuthRequired(req *fetch.EventAuthRequired) {
 	_ = fetch.ContinueWithAuth(req.RequestID, &authRes).Do(ctx)
 }
 
-/**
+/*
+*
 处理导航请求
 */
 func (tab *Tab) HandleNavigationReq(req *model2.Request, v *fetch.EventRequestPaused) {
@@ -156,7 +160,8 @@ func (tab *Tab) HandleNavigationReq(req *model2.Request, v *fetch.EventRequestPa
 	}
 }
 
-/**
+/*
+*
 处理Host绑定
 */
 func (tab *Tab) HandleHostBinding(req *model2.Request) {
@@ -189,7 +194,8 @@ func (tab *Tab) IsTopFrame(FrameID string) bool {
 	return FrameID == tab.TopFrameId
 }
 
-/**
+/*
+*
 解析响应内容中的URL 使用正则匹配
 */
 func (tab *Tab) ParseResponseURL(v *network.EventResponseReceived) {
@@ -221,7 +227,9 @@ func (tab *Tab) HandleRedirectionResp(v *network.EventResponseReceivedExtraInfo)
 	statusCode := tab.GetStatusCode(v.HeadersText)
 	// 导航请求，且返回重定向
 	if 300 <= statusCode && statusCode < 400 {
-		logger.Logger.Debug("set redirect flag.")
+		logger.Logger.Infof("statusCode:%d ", statusCode)
+		logger.Logger.Info("set redirect flag.")
+		tab.FoundRedirection = true
 		tab.FoundRedirection = true
 	}
 }

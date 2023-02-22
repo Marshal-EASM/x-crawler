@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Qianlitp/crawlergo/pkg/utils"
 	"log"
 	"os"
 	"os/signal"
@@ -54,13 +55,16 @@ const (
 )
 
 var (
-	taskConfig              pkg.TaskConfig
-	outputMode              string
-	postData                string
-	signalChan              chan os.Signal
-	ignoreKeywords          = cli.NewStringSlice(config.DefaultIgnoreKeywords...)
-	customFormTypeValues    = cli.NewStringSlice()
+	taskConfig pkg.TaskConfig
+
+	outputMode           string
+	postData             string
+	signalChan           chan os.Signal
+	ignoreKeywords       = cli.NewStringSlice(config.DefaultIgnoreKeywords...)
+	customFormTypeValues = cli.NewStringSlice()
+
 	customFormKeywordValues = cli.NewStringSlice()
+	ignoreResponseKeywords  = cli.NewStringSlice()
 	pushAddress             string
 	pushProxyPoolMax        int
 	pushProxyWG             sync.WaitGroup
@@ -98,10 +102,6 @@ func main() {
 func run(c *cli.Context) error {
 	signalChan = make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
-	if c.Args().Len() == 0 {
-		logger.Logger.Error("url must be set")
-		return errors.New("url must be set")
-	}
 
 	// 设置日志输出级别
 	level, err := logrus.ParseLevel(logLevel)
@@ -110,12 +110,35 @@ func run(c *cli.Context) error {
 	}
 	logger.Logger.SetLevel(level)
 
+	var urlList []string
+
+	if taskConfig.Url == "" && taskConfig.UrlFile == "" {
+		logger.Logger.Fatal("url or url_file must be set")
+
+	}
+	if taskConfig.Url != "" {
+		urlList = append(urlList, taskConfig.Url)
+	}
+
+	if taskConfig.UrlFile != "" {
+		fileData, err := utils.ReadFile(taskConfig.UrlFile)
+		if err != nil {
+			logger.Logger.Error("parse url failed, ", err)
+			return err
+		}
+		for _, url := range fileData {
+			if url != "" {
+				urlList = append(urlList, url)
+			}
+		}
+	}
+
 	var targets []*model2.Request
-	for _, _url := range c.Args().Slice() {
+	for _, _url := range urlList {
 		var req model2.Request
 		url, err := model2.GetUrl(_url)
 		if err != nil {
-			logger.Logger.Error("parse url failed, ", err)
+			logger.Logger.Errorf("parse url %s failed %s, ", url, err)
 			continue
 		}
 		if postData != "" {
@@ -126,6 +149,7 @@ func run(c *cli.Context) error {
 		req.Proxy = taskConfig.Proxy
 		targets = append(targets, &req)
 	}
+
 	taskConfig.IgnoreKeywords = ignoreKeywords.Value()
 	if taskConfig.Proxy != "" {
 		logger.Logger.Info("request with proxy: ", taskConfig.Proxy)
@@ -254,7 +278,8 @@ func outputResult(result *pkg.Result) {
 	}
 }
 
-/**
+/*
+*
 原生被动代理推送支持
 */
 func Push2Proxy(reqList []*model2.Request) {
@@ -277,7 +302,8 @@ func Push2Proxy(reqList []*model2.Request) {
 	pushProxyWG.Wait()
 }
 
-/**
+/*
+*
 协程池请求的任务
 */
 func (p *ProxyTask) doRequest() {

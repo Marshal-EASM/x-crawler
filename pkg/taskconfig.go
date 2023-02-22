@@ -3,6 +3,7 @@ package pkg
 import "time"
 
 type TaskConfig struct {
+	Url                     string //Url
 	MaxCrawlCount           int    // 最大爬取的数量
 	FilterMode              string // simple、smart、strict
 	ExtraHeaders            map[string]interface{}
@@ -14,6 +15,7 @@ type TaskConfig struct {
 	TabRunTimeout           time.Duration     // 单个标签页超时
 	PathByFuzz              bool              // 通过字典进行Path Fuzz
 	FuzzDictPath            string            //Fuzz目录字典
+	UrlFile                 string            //UrlFile
 	PathFromRobots          bool              // 解析Robots文件找出路径
 	MaxTabsCount            int               // 允许开启的最大标签页数量 即同时爬取的数量
 	ChromiumPath            string            // Chromium的程序路径  `/home/zhusiyu1/chrome-linux/chrome`

@@ -10,8 +10,8 @@ const (
 	DefaultUA               = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.0 Safari/537.36"
 	MaxTabsCount            = 10
 	TabRunTimeout           = 20 * time.Second
-	DefaultInputText        = "Crawlergo"
-	FormInputKeyword        = "Crawlergo"
+	DefaultInputText        = "xiaoming"
+	FormInputKeyword        = "xiaoming"
 	SuspectURLRegex         = `(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;|*()(%%$^/\\\[\]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\?|#][^"|']{0,}|)))(?:"|')`
 	URLRegex                = `((https?|ftp|file):)?//[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`
 	AttrURLRegex            = ``
@@ -19,7 +19,7 @@ const (
 	EventTriggerInterval    = 100 * time.Millisecond // 单位毫秒
 	BeforeExitDelay         = 1 * time.Second
 	DefaultEventTriggerMode = EventTriggerAsync
-	MaxCrawlCount           = 200
+	MaxCrawlCount           = 1000
 )
 
 // 请求方法
