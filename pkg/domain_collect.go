@@ -7,7 +7,7 @@ import (
 	mapset "github.com/deckarep/golang-set"
 )
 
-func SubDomainCollect(reqList []*model.Request, HostLimit string) []string {
+func SubDomainCollect(reqList []*model.Request, HostLimit []string) []string {
 	var subDomainList []string
 	uniqueSet := mapset.NewSet()
 	for _, req := range reqList {
@@ -16,9 +16,12 @@ func SubDomainCollect(reqList []*model.Request, HostLimit string) []string {
 			continue
 		}
 		uniqueSet.Add(domain)
-		if strings.HasSuffix(domain, "."+HostLimit) {
-			subDomainList = append(subDomainList, domain)
+		for _, host := range HostLimit {
+			if strings.HasSuffix(domain, "."+host) {
+				subDomainList = append(subDomainList, domain)
+			}
 		}
+
 	}
 	return subDomainList
 }

@@ -15,7 +15,7 @@ import (
 
 type CrawlerTask struct {
 	Browser       *engine2.Browser    //
-	RootDomain    string              // 当前爬取根域名 用于子域名收集
+	RootDomain    []string            // 当前爬取根域名 用于子域名收集
 	Targets       []*model.Request    // 输入目标
 	Result        *Result             // 最终结果
 	Config        *TaskConfig         // 配置信息
@@ -40,16 +40,21 @@ type tabTask struct {
 	req         *model.Request
 }
 
-/**
+/*
+*
 新建爬虫任务
 */
 func NewCrawlerTask(targets []*model.Request, taskConf TaskConfig) (*CrawlerTask, error) {
+	var limitList []string
+	for _, req := range targets {
+		limitList = append(limitList, req.URL.Host)
+	}
 	crawlerTask := CrawlerTask{
 		Result: &Result{},
 		Config: &taskConf,
 		smartFilter: filter2.SmartFilter{
 			SimpleFilter: filter2.SimpleFilter{
-				HostLimit: targets[0].URL.Host,
+				HostLimit: limitList,
 			},
 		},
 	}
@@ -96,7 +101,11 @@ func NewCrawlerTask(targets []*model.Request, taskConf TaskConfig) (*CrawlerTask
 	}
 
 	crawlerTask.Browser = engine2.InitBrowser(taskConf.ChromiumPath, taskConf.ExtraHeaders, taskConf.Proxy, taskConf.NoHeadless)
-	crawlerTask.RootDomain = targets[0].URL.RootDomain()
+	rootDomainList := make([]string, 0)
+	for _, req := range targets {
+		rootDomainList = append(rootDomainList, req.URL.RootDomain())
+	}
+	crawlerTask.RootDomain = rootDomainList
 
 	crawlerTask.smartFilter.Init()
 
@@ -107,7 +116,8 @@ func NewCrawlerTask(targets []*model.Request, taskConf TaskConfig) (*CrawlerTask
 	return &crawlerTask, nil
 }
 
-/**
+/*
+*
 根据请求列表生成tabTask协程任务列表
 */
 func (t *CrawlerTask) generateTabTask(req *model.Request) *tabTask {
@@ -119,7 +129,8 @@ func (t *CrawlerTask) generateTabTask(req *model.Request) *tabTask {
 	return &task
 }
 
-/**
+/*
+*
 开始当前任务
 */
 func (t *CrawlerTask) Run() {
@@ -183,7 +194,8 @@ func (t *CrawlerTask) Run() {
 	t.Result.SubDomainList = SubDomainCollect(t.Result.AllReqList, t.RootDomain)
 }
 
-/**
+/*
+*
 添加任务到协程池
 添加之前实时过滤
 */
@@ -208,7 +220,8 @@ func (t *CrawlerTask) addTask2Pool(req *model.Request) {
 	}()
 }
 
-/**
+/*
+*
 单个运行的tab标签任务，实现了workpool的接口
 */
 func (t *tabTask) Task() {

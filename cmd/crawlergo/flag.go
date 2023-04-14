@@ -253,7 +253,7 @@ func SetFormValues() *cli.StringSliceFlag {
 	return &cli.StringSliceFlag{
 		Name:        "form-values",
 		Aliases:     []string{"fv"},
-		Usage:       "custom filling text for each form type. e.g.: -fv username=crawlergo_nice -fv password=admin123",
+		Usage:       "custom filling text for each form type. e.g.: -fv username=xiaoMing -fv password=admin123",
 		Destination: customFormTypeValues,
 	}
 }

@@ -149,7 +149,6 @@ func run(c *cli.Context) error {
 		req.Proxy = taskConfig.Proxy
 		targets = append(targets, &req)
 	}
-
 	taskConfig.IgnoreKeywords = ignoreKeywords.Value()
 	if taskConfig.Proxy != "" {
 		logger.Logger.Info("request with proxy: ", taskConfig.Proxy)
@@ -170,14 +169,15 @@ func run(c *cli.Context) error {
 	}
 
 	// 开始爬虫任务
+
 	task, err := pkg.NewCrawlerTask(targets, taskConfig)
 	if err != nil {
 		logger.Logger.Error("create crawler task failed.")
 		os.Exit(-1)
 	}
 	if len(targets) != 0 {
-		logger.Logger.Info(fmt.Sprintf("Init crawler task, host: %s, max tab count: %d, max crawl count: %d.",
-			targets[0].URL.Host, taskConfig.MaxTabsCount, taskConfig.MaxCrawlCount))
+		logger.Logger.Info(fmt.Sprintf("Init crawler task, host cnt: %s, max tab count: %d, max crawl count: %d.",
+			len(targets), taskConfig.MaxTabsCount, taskConfig.MaxCrawlCount))
 		logger.Logger.Info("filter mode: ", taskConfig.FilterMode)
 	}
 

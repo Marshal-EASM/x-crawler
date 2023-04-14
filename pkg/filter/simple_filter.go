@@ -13,7 +13,7 @@ import (
 
 type SimpleFilter struct {
 	UniqueSet mapset.Set
-	HostLimit string
+	HostLimit []string
 }
 
 var (
@@ -35,7 +35,8 @@ func (s *SimpleFilter) DoFilter(req *model.Request) bool {
 		s.UniqueSet = mapset.NewSet()
 	}
 	// 首先判断是否需要过滤域名
-	if s.HostLimit != "" && s.DomainFilter(req) {
+
+	if len(s.HostLimit) != 0 && s.DomainFilter(req) {
 		return true
 	}
 	// 去重
@@ -119,18 +120,21 @@ func (s *SimpleFilter) DomainFilter(req *model.Request) bool {
 	if s.UniqueSet == nil {
 		s.UniqueSet = mapset.NewSet()
 	}
-	if req.URL.Host == s.HostLimit || req.URL.Hostname() == s.HostLimit {
-		return false
-	}
-	if strings.HasSuffix(s.HostLimit, ":80") && req.URL.Port() == "" && req.URL.Scheme == "http" {
-		if req.URL.Hostname()+":80" == s.HostLimit {
+	for _, host := range s.HostLimit {
+		if req.URL.Host == host || req.URL.Hostname() == host {
 			return false
 		}
-	}
-	if strings.HasSuffix(s.HostLimit, ":443") && req.URL.Port() == "" && req.URL.Scheme == "https" {
-		if req.URL.Hostname()+":443" == s.HostLimit {
-			return false
+		if strings.HasSuffix(host, ":80") && req.URL.Port() == "" && req.URL.Scheme == "http" {
+			if req.URL.Hostname()+":80" == host {
+				return false
+			}
+		}
+		if strings.HasSuffix(host, ":443") && req.URL.Port() == "" && req.URL.Scheme == "https" {
+			if req.URL.Hostname()+":443" == host {
+				return false
+			}
 		}
 	}
+
 	return true
 }

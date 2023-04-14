@@ -230,7 +230,6 @@ func (tab *Tab) HandleRedirectionResp(v *network.EventResponseReceivedExtraInfo)
 		logger.Logger.Infof("statusCode:%d ", statusCode)
 		logger.Logger.Info("set redirect flag.")
 		tab.FoundRedirection = true
-		tab.FoundRedirection = true
 	}
 }
 
