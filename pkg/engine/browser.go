@@ -83,7 +83,6 @@ func InitBrowser(chromiumPath string, extraHeaders map[string]interface{}, proxy
 func (bro *Browser) NewTab(timeout time.Duration) (*context.Context, context.CancelFunc) {
 	bro.lock.Lock()
 	ctx, cancel := chromedp.NewContext(*bro.Ctx)
-	//defer cancel()
 	tCtx, _ := context.WithTimeout(ctx, timeout)
 	bro.tabs = append(bro.tabs, &tCtx)
 	bro.tabCancels = append(bro.tabCancels, cancel)

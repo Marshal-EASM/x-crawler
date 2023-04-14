@@ -71,7 +71,7 @@ func (s *SimpleFilter) RequestFilter(req *model.Request) bool {
 		panic(err)
 	}
 	// 如果返回404\502过滤该请求
-	if res.StatusCode == 404 || res.StatusCode == 502 || res.StatusCode == 407 || res.StatusCode == 503 {
+	if res.StatusCode == 502 || res.StatusCode == 407 || res.StatusCode == 503 {
 		return true
 	}
 	return false
